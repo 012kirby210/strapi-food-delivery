@@ -362,6 +362,77 @@ export interface AdminTransferTokenPermission extends Schema.CollectionType {
   };
 }
 
+export interface ApiDishDish extends Schema.CollectionType {
+  collectionName: 'dishes';
+  info: {
+    singularName: 'dish';
+    pluralName: 'dishes';
+    displayName: 'dish';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    name: Attribute.String;
+    description: Attribute.Text;
+    image: Attribute.Media;
+    priceInCents: Attribute.Decimal;
+    restaurant: Attribute.Relation<
+      'api::dish.dish',
+      'manyToOne',
+      'api::restaurant.restaurant'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::dish.dish', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::dish.dish', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiOrderOrder extends Schema.CollectionType {
+  collectionName: 'orders';
+  info: {
+    singularName: 'order';
+    pluralName: 'orders';
+    displayName: 'order';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    adress: Attribute.String;
+    city: Attribute.String;
+    state: Attribute.String;
+    amount: Attribute.Integer;
+    token: Attribute.String;
+    dishes: Attribute.JSON;
+    user: Attribute.Relation<
+      'api::order.order',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::order.order',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::order.order',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiRestaurantRestaurant extends Schema.CollectionType {
   collectionName: 'restaurants';
   info: {
@@ -376,6 +447,11 @@ export interface ApiRestaurantRestaurant extends Schema.CollectionType {
     name: Attribute.String;
     description: Attribute.Blocks;
     image: Attribute.Media;
+    dishes: Attribute.Relation<
+      'api::restaurant.restaurant',
+      'oneToMany',
+      'api::dish.dish'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -783,6 +859,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.role'
     >;
+    orders: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::order.order'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -810,6 +891,8 @@ declare module '@strapi/types' {
       'admin::api-token-permission': AdminApiTokenPermission;
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
+      'api::dish.dish': ApiDishDish;
+      'api::order.order': ApiOrderOrder;
       'api::restaurant.restaurant': ApiRestaurantRestaurant;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
